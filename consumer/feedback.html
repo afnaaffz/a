@@ -1,0 +1,63 @@
+{% extends "consumer/consumer base.html" %}
+{% load crispy_forms_filters %}
+
+{% block title %}Feedback Form{% endblock %}
+
+{% block content %}
+<div class="card">
+    <h4>FEEDBACK</h4>
+    <div class="form-container">
+        {% if form.errors %}
+        <div class="alert alert-danger">
+            <ul>
+                {% for field in form %}
+                    {% for error in field.errors %}
+                        <li>{{ field.label }}: {{ error }}</li>  <!-- Display field label with error -->
+                    {% endfor %}
+                {% endfor %}
+                {% for error in form.non_field_errors %}
+                    <li>{{ error }}</li>
+                {% endfor %}
+            </ul>
+        </div>
+        {% endif %}
+
+        <form method="POST">
+            {% csrf_token %}
+            {{ form.industry|as_crispy_field }}  <!-- Render the industry field -->
+            {{ form.subject|as_crispy_field }}  <!-- Render subject field -->
+            {{ form.description|as_crispy_field }}  <!-- Render description field -->
+            {{ form.rating }} <!-- Ensure this hidden field is included for submission -->
+
+            <label for="id_rating">Rating:</label>
+            <div class="star-rating">
+                {% for i in "12345" %}
+                    <i class="fa-star fa-lg far" data-value="{{ i }}" onclick="setRating({{ i }})"></i>
+                {% endfor %}
+            </div>
+
+            <button type="submit" class="btn btn-primary">Add</button>
+        </form>
+    </div>
+</div>
+
+<script>
+    function setRating(value) {
+        document.getElementById("id_rating").value = value;  // Set the value of the hidden input
+
+        const stars = document.querySelectorAll(".star-rating .fa-star");
+        stars.forEach((star, index) => {
+            if (index < value) {
+                star.classList.add("fas");  // filled star
+                star.classList.remove("far");  // empty star
+            } else {
+                star.classList.add("far");
+                star.classList.remove("fas");
+            }
+        });
+    }
+
+    // Initialize with no stars selected
+    setRating(0);
+</script>
+{% endblock %}
